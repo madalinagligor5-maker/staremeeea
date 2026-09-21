@@ -1,0 +1,5 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+const sections=["Articole și resurse","Exerciții de calm","Prompturi de jurnal","Template-uri ADHD","Programe","Testimoniale verificate","Homepage și FAQ","Prețuri și social"];
+export default async function AdminPage(){const supabase=await createClient();if(!supabase)redirect("/autentificare");const {data}=await supabase.auth.getUser();if(data.user?.app_metadata?.role!=="admin")redirect("/spatiu/azi");return <main className="container-shell py-14"><p className="eyebrow">Administrare</p><h1 className="display mt-3 text-6xl font-semibold text-[var(--wine)]">Conținut Starea Mea</h1><p className="mt-4 text-[var(--muted)]">Acces restricționat prin app_metadata.role = admin. Politicile RLS validează aceeași autorizare.</p><div className="mt-10 grid gap-4 md:grid-cols-2">{sections.map(x=><section key={x} className="editorial-card p-6"><h2 className="font-bold text-[var(--wine)]">{x}</h2><p className="mt-2 text-sm leading-6 text-[var(--muted)]">Structura de date și politicile sunt pregătite pentru editorul CRUD.</p></section>)}</div></main>}

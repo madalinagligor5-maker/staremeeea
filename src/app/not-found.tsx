@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <main className="grid min-h-[100dvh] place-items-center p-6 text-center"><div><p className="eyebrow">404</p><h1 className="display mt-4 text-7xl font-semibold text-[var(--wine)]">Pagina s-a rătăcit puțin.</h1><p className="mt-5 text-[var(--muted)]">Nu-i nimic. Putem începe din nou de aici.</p><Link href="/" className="button-primary mt-8">Înapoi acasă</Link></div></main>}

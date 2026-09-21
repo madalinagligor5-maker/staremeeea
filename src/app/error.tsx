@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorPage({reset}:{reset:()=>void}){return <main className="grid min-h-[100dvh] place-items-center p-6 text-center"><div><p className="eyebrow">Ceva nu a mers</p><h1 className="display mt-4 text-6xl font-semibold text-[var(--wine)]">Luăm o pauză și încercăm din nou.</h1><button onClick={reset} className="button-primary mt-8">Încearcă din nou</button></div></main>}

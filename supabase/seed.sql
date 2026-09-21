@@ -1,0 +1,2 @@
+-- Conținutul de bază public este inclus în migrarea inițială.
+-- Testimonialele nu sunt seed-uite: în producție secțiunea rămâne ascunsă până există conținut verificat.

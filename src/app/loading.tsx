@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="container-shell py-20" aria-label="Se încarcă"><div className="h-3 w-32 animate-pulse rounded-full bg-[var(--rose-soft)]"/><div className="mt-7 h-20 max-w-3xl animate-pulse rounded-2xl bg-[var(--blush)]"/><div className="mt-6 h-40 max-w-2xl animate-pulse rounded-2xl bg-white"/></main>}

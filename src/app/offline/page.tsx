@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function OfflinePage() { return <main className="grid min-h-[100dvh] place-items-center p-6"><div className="editorial-card max-w-md p-8 text-center"><p className="eyebrow">Ești offline</p><h1 className="display mt-4 text-5xl font-semibold text-[var(--wine)]">E în regulă.</h1><p className="mt-4 leading-7 text-[var(--muted)]">Unele lucruri au nevoie de conexiune. Poți reveni când ești pregătită.</p><Link className="button-primary mt-7" href="/spatiu/azi">Încearcă din nou</Link></div></main>; }
