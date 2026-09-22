@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description: "Un spațiu blând pentru organizare, focus, journaling și wellbeing — fără presiune, fără diagnostic.",
   applicationName: "Ritualul de Azi",
   manifest: "/manifest.webmanifest",
+  icons: { icon: "/images/ritualul-de-azi-monogram.png", apple: "/images/ritualul-de-azi-monogram.png" },
   openGraph: { type: "website", locale: "ro_RO", siteName: "Ritualul de Azi", title: "Fă loc pentru tine.", description: "Ritualuri mici pentru organizare, focus și wellbeing, într-un ritm mai blând." },
   twitter: { card: "summary_large_image", title: "Ritualul de Azi", description: "Minte echilibrată. Viață mai blândă." },
 };
