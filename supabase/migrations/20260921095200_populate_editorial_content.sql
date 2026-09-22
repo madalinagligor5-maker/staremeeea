@@ -87,6 +87,6 @@ where not exists (select 1 from public.journal_prompts j where j.prompt = v.prom
 
 insert into public.site_content (content_key, value) values
   ('brand.promise', '{"title":"Un spațiu pentru mintea ta, exact așa cum este.","note":"Organizare, focus și wellbeing fără presiune."}'::jsonb),
-  ('contact.details', '{"email":"hello@stareamea.ro","response_time":"2 zile lucrătoare"}'::jsonb),
+  ('contact.details', '{"email":"hello@ritualuldeazi.ro","response_time":"2 zile lucrătoare"}'::jsonb),
   ('editorial.disclaimer', '{"text":"Conținut pentru wellbeing și organizare. Nu înlocuiește sprijinul profesionist."}'::jsonb)
 on conflict (content_key) do update set value = excluded.value, updated_at = now();

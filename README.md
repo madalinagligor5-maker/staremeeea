@@ -1,4 +1,4 @@
-# Starea Mea
+# Ritualul de Azi
 
 MVP PWA Romanian-first pentru organizare blândă, focus, journaling și wellbeing. Produsul nu diagnostichează și nu tratează afecțiuni medicale. Recomandările sunt deterministe; nu există AI în fluxurile de produs.
 
@@ -47,7 +47,7 @@ Setează rolul de admin dintr-un mediu server sigur:
 
 ## Stripe
 
-1. Creează un produs Starea Mea Plus și două Price-uri recurente (RON/lună și RON/an).
+1. Creează un produs Ritualul de Azi Plus și două Price-uri recurente (RON/lună și RON/an).
 2. Pune ID-urile în `STRIPE_PLUS_MONTHLY_PRICE_ID` și `STRIPE_PLUS_ANNUAL_PRICE_ID`.
 3. Configurează webhook-ul către `https://domeniul-tau/api/stripe/webhook` pentru:
    - `checkout.session.completed`
@@ -88,4 +88,4 @@ npm run deploy
 
 ## Imagine generată
 
-`public/images/hero-journal.png` a fost creată cu instrumentul built-in de generare imagini. Promptul final cere o fotografie editorială naturală, text-free, cu jurnal alb, cafea, flori dusty-rose, lumină calmă și paleta Starea Mea.
+`public/images/hero-journal.png` a fost creată cu instrumentul built-in de generare imagini. Promptul final cere o fotografie editorială naturală, text-free, cu jurnal alb, cafea, flori dusty-rose, lumină calmă și paleta Ritualul de Azi.
