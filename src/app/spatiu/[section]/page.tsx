@@ -9,9 +9,10 @@ import { Journal } from "@/components/space/journal";
 import { Patterns } from "@/components/space/patterns";
 import { Planner } from "@/components/space/planner";
 import { Profile } from "@/components/space/profile";
+import { RitualLibrary } from "@/components/space/ritual-library";
 import { getPublicResources } from "@/lib/public-data";
 
-const tools: Record<string, React.ComponentType> = { planificator: Planner, "brain-dump": BrainDump, "nu-pot-sa-incep": CantStart, focus: FocusTimer, calm: CalmLibrary, jurnal: Journal, patterns: Patterns, profil: Profile };
+const tools: Record<string, React.ComponentType> = { ritualuri: RitualLibrary, planificator: Planner, "brain-dump": BrainDump, "nu-pot-sa-incep": CantStart, focus: FocusTimer, calm: CalmLibrary, jurnal: Journal, patterns: Patterns, profil: Profile };
 
 export default async function SpaceSection({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;

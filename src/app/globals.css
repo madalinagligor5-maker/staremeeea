@@ -50,6 +50,65 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .button-primary:active, .button-secondary:active { transform: translateY(1px); }
 .editorial-card { border: 1px solid var(--line); border-radius: 18px; background: rgba(255,250,248,.78); box-shadow: 0 18px 60px rgba(86,55,62,.055); }
 
+.skip-link { position: fixed; left: 1rem; top: -5rem; z-index: 100; border-radius: .75rem; background: var(--wine); padding: .75rem 1rem; color: white; transition: top .2s ease; }
+.skip-link:focus { top: 1rem; }
+.app-header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--line); background: rgba(252,249,245,.88); backdrop-filter: blur(18px); }
+.app-nav-link { display: inline-flex; min-height: 2.7rem; align-items: center; gap: .45rem; border-radius: 999px; padding: .65rem .95rem; color: var(--muted); font-size: .82rem; font-weight: 700; transition: background .2s ease, color .2s ease, transform .2s ease; }
+.app-nav-link:hover { background: white; color: var(--wine); transform: translateY(-1px); }
+.app-nav-link.is-active { background: var(--blush); color: var(--wine); }
+.profile-seal { display: grid; width: 2.65rem; height: 2.65rem; place-items: center; border: 1px solid rgba(89,56,67,.13); border-radius: 50%; background: var(--wine); color: white; font-family: var(--font-serif), Georgia, serif; font-weight: 700; box-shadow: 0 8px 24px rgba(89,56,67,.16); }
+.mobile-dock { position: fixed; inset: auto .75rem .75rem; z-index: 50; display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 1.25rem; background: rgba(255,253,249,.94); padding: .45rem; box-shadow: 0 18px 50px rgba(86,55,62,.16); backdrop-filter: blur(18px); }
+.mobile-dock-link { display: flex; min-height: 3.25rem; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; border-radius: .9rem; color: var(--muted); font-size: .62rem; font-weight: 700; }
+.mobile-dock-link.is-active { background: var(--blush); color: var(--wine); }
+.dashboard-intro { display: grid; align-items: end; gap: 2rem; }
+.dashboard-note { display: flex; align-items: flex-start; gap: .75rem; border-left: 1px solid var(--line); padding-left: 1.5rem; color: var(--rose-dark); font-size: .8rem; line-height: 1.65; }
+.ritual-stage { overflow: hidden; border: 1px solid var(--line); border-radius: 1.35rem; background: rgba(255,253,249,.86); box-shadow: 0 24px 80px rgba(86,55,62,.07); }
+.ritual-stage-inner { padding: 1.5rem; }
+.ritual-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; padding: .65rem; background: rgba(238,221,226,.32); }
+.ritual-progress span { height: .22rem; border-radius: 999px; background: rgba(89,56,67,.1); }
+.ritual-progress span.is-complete { background: var(--rose); }
+.state-tile { display: flex; min-height: 8.5rem; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); border-radius: 1rem; background: white; padding: 1rem; text-align: left; color: var(--wine); font-size: .8rem; font-weight: 700; transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+.state-tile:hover { transform: translateY(-2px); border-color: rgba(170,109,125,.45); box-shadow: 0 12px 30px rgba(89,56,67,.08); }
+.state-tile.is-selected { border-color: var(--rose); background: var(--blush); box-shadow: inset 0 0 0 1px var(--rose); }
+.scale-choice { display: grid; aspect-ratio: 1; max-height: 7.5rem; place-items: center; border: 1px solid var(--line); border-radius: 1rem; background: white; color: var(--wine); font-size: 1.15rem; font-weight: 800; transition: transform .2s ease, background .2s ease, color .2s ease; }
+.scale-choice:hover { transform: translateY(-2px); }
+.scale-choice.is-selected { border-color: var(--rose); background: var(--rose); color: white; }
+.completion-mark { display: grid; width: 3.25rem; height: 3.25rem; place-items: center; border-radius: 50%; background: var(--wine); color: white; box-shadow: 0 12px 28px rgba(89,56,67,.18); }
+.recommendation-card { display: flex; min-height: 15rem; flex-direction: column; border: 1px solid var(--line); border-radius: 1.1rem; background: white; padding: 1.35rem; transition: transform .2s ease, box-shadow .2s ease; }
+.recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 16px 45px rgba(89,56,67,.09); }
+.recommendation-card.is-featured { background: var(--blush); }
+.library-invite { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-radius: 1.1rem; background: var(--wine); padding: 1.4rem; color: white; transition: transform .2s ease; }
+.library-invite:hover { transform: translateY(-2px); }
+.library-invite .eyebrow { color: var(--rose-soft); }
+.library-invite strong { display: block; margin-top: .45rem; font-family: var(--font-serif), Georgia, serif; font-size: 1.25rem; line-height: 1.1; }
+.library-hero { display: grid; align-items: end; gap: 2.5rem; }
+.library-hero > p { max-width: 32rem; color: var(--muted); line-height: 1.8; }
+.filter-row { display: flex; gap: .5rem; overflow-x: auto; margin-top: 3rem; padding-bottom: .5rem; scrollbar-width: none; }
+.filter-row button { flex: none; min-height: 2.65rem; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.7); padding: .6rem 1rem; color: var(--muted); font-size: .78rem; font-weight: 700; }
+.filter-row button.is-active { border-color: var(--wine); background: var(--wine); color: white; }
+.ritual-grid { display: grid; gap: .8rem; margin-top: 1.2rem; }
+.ritual-card { display: flex; min-height: 18rem; flex-direction: column; border: 1px solid rgba(89,56,67,.1); border-radius: 1.15rem; padding: 1.5rem; color: var(--wine); text-align: left; transition: transform .24s ease, box-shadow .24s ease; }
+.ritual-card:hover { transform: translateY(-3px); box-shadow: 0 22px 55px rgba(89,56,67,.1); }
+.ritual-card.tone-rose { background: var(--blush); }
+.ritual-card.tone-sage { background: #e5e9e1; }
+.ritual-card.tone-plum { background: var(--wine); color: white; }
+.ritual-card.tone-plum .eyebrow { color: var(--rose-soft); }
+.ritual-card.tone-plum h2 { color: white; }
+.ritual-reader { min-height: calc(100dvh - 5rem); padding: 2rem 1rem; background: radial-gradient(circle at 75% 15%, rgba(238,221,226,.7), transparent 24rem), var(--ivory); }
+.ritual-reader-inner { width: min(100%, 56rem); margin: 0 auto; border: 1px solid var(--line); border-radius: 1.5rem; background: rgba(255,253,249,.84); padding: 1.5rem; box-shadow: 0 30px 90px rgba(86,55,62,.08); }
+
+@media (min-width: 48rem) {
+  .mobile-dock { display: none; }
+  .dashboard-intro, .library-hero { grid-template-columns: minmax(0, 1fr) 19rem; }
+  .ritual-stage-inner { padding: 2rem; }
+  .ritual-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ritual-card.is-large { grid-row: span 2; min-height: 36.8rem; }
+  .ritual-reader { padding: 3rem 1.5rem; }
+  .ritual-reader-inner { padding: 2.5rem; }
+}
+
+@media (min-width: 64rem) { .ritual-grid { grid-template-columns: 1.1fr .9fr .9fr; } }
+
 .brand-mark {
   position: relative;
   display: block;
