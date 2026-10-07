@@ -1,24 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Fraunces, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
-const serif = Cormorant_Garamond({ subsets: ["latin", "latin-ext"], variable: "--font-serif", weight: ["500", "600", "700"], display: "swap" });
-const sans = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-sans", display: "swap" });
+const serif = Fraunces({ subsets: ["latin", "latin-ext"], variable: "--font-serif", display: "swap" });
+const sans = Nunito_Sans({ subsets: ["latin", "latin-ext"], variable: "--font-sans", display: "swap" });
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ritualuldeazi.ro";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "Ritualul de Azi — Minte echilibrată. Viață mai blândă.", template: "%s | Ritualul de Azi" },
-  description: "Un spațiu blând pentru organizare, focus, journaling și wellbeing — fără presiune, fără diagnostic.",
+  title: { default: "Ritualul de azi — Mai puțin de purtat", template: "%s | Ritualul de Azi" },
+  description: "Un sistem de organizare pentru zilele grele. Structură blândă, cu trei niveluri de efort, pentru oamenii obosiți care poartă prea multe.",
   applicationName: "Ritualul de Azi",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/images/ritualul-de-azi-monogram.png", apple: "/images/ritualul-de-azi-monogram.png" },
-  openGraph: { type: "website", locale: "ro_RO", siteName: "Ritualul de Azi", title: "Fă loc pentru tine.", description: "Ritualuri mici pentru organizare, focus și wellbeing, într-un ritm mai blând." },
-  twitter: { card: "summary_large_image", title: "Ritualul de Azi", description: "Minte echilibrată. Viață mai blândă." },
+  openGraph: { type: "website", locale: "ro_RO", siteName: "Ritualul de Azi", title: "Ritualul de azi — Mai puțin de purtat", description: "Structură blândă pentru zilele grele. Fii prima care află." },
+  twitter: { card: "summary", title: "Ritualul de azi", description: "Mai puțin de purtat." },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#FCF9F5" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#F6EFE6" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="ro"><body className={`${serif.variable} ${sans.variable}`}><ServiceWorkerRegister />{children}</body></html>;
