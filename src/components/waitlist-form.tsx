@@ -10,7 +10,7 @@ export function WaitlistForm() {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(form);
+    const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "").trim();
     if (!emailPattern.test(email)) return setState({ kind: "error", message: "Verifică adresa de email, te rog." });
     if (!data.get("consent")) return setState({ kind: "error", message: "Bifează acordul ca să te putem înscrie." });
