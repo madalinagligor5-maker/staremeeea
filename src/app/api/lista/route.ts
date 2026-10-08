@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   try { db = createAdminClient(); } catch { return fail("Serviciul nu este configurat încă. Încearcă mai târziu.", 500); }
 
   const { data: existing, error: readError } = await db.from("waitlist").select("id, confirm_token, unsubscribe_token, confirmation_sent_at, confirmed_at, unsubscribed_at").eq("email", email).maybeSingle();
-  if (readError) { console.error("[lista] citire waitlist:", readError.message, readError.code); return fail(`Ceva n-a mers. Încearcă din nou în câteva minute. (cod citire: ${readError.code ?? readError.message.slice(0, 60)})`, 500); }
+  if (readError) { console.error("[lista] citire waitlist:", readError.message, readError.code); return fail("Ceva n-a mers. Încearcă din nou în câteva minute.", 500); }
 
   let row = existing;
   if (row && row.confirmed_at && !row.unsubscribed_at) return NextResponse.json({ ok: true }); // deja pe listă; nu dezvăluim asta
@@ -39,12 +39,12 @@ export async function POST(request: Request) {
   const now = new Date().toISOString();
   if (!row) {
     const { data, error } = await db.from("waitlist").insert({ email, consent_text: waitlistConsentText, consented_at: now, source: "lansare" }).select("id, confirm_token, unsubscribe_token, confirmation_sent_at, confirmed_at, unsubscribed_at").single();
-    if (error || !data) { console.error("[lista] scriere waitlist:", error?.message, error?.code); return fail(`Ceva n-a mers. Încearcă din nou în câteva minute. (cod scriere: ${error?.code ?? error?.message?.slice(0, 60)})`, 500); }
+    if (error || !data) { console.error("[lista] scriere waitlist:", error?.message, error?.code); return fail("Ceva n-a mers. Încearcă din nou în câteva minute.", 500); }
     row = data;
   } else if (row.unsubscribed_at) {
     // Reînscriere după dezabonare: acord nou, token nou.
     const { data, error } = await db.from("waitlist").update({ consent_text: waitlistConsentText, consented_at: now, confirm_token: newToken(), confirmed_at: null, unsubscribed_at: null, confirmation_sent_at: null }).eq("id", row.id).select("id, confirm_token, unsubscribe_token, confirmation_sent_at, confirmed_at, unsubscribed_at").single();
-    if (error || !data) { console.error("[lista] scriere waitlist:", error?.message, error?.code); return fail(`Ceva n-a mers. Încearcă din nou în câteva minute. (cod scriere: ${error?.code ?? error?.message?.slice(0, 60)})`, 500); }
+    if (error || !data) { console.error("[lista] scriere waitlist:", error?.message, error?.code); return fail("Ceva n-a mers. Încearcă din nou în câteva minute.", 500); }
     row = data;
   } else if (row.confirmation_sent_at && Date.now() - new Date(row.confirmation_sent_at).getTime() < RESEND_COOLDOWN_MS) {
     return NextResponse.json({ ok: true }); // am trimis deja un email de curând
