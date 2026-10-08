@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { Analytics } from "@/components/analytics";
 
 const serif = Fraunces({ subsets: ["latin", "latin-ext"], variable: "--font-serif", display: "swap" });
 const sans = Nunito_Sans({ subsets: ["latin", "latin-ext"], variable: "--font-sans", display: "swap" });
@@ -20,5 +21,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#F6EFE6" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ro"><body className={`${serif.variable} ${sans.variable}`}><ServiceWorkerRegister />{children}</body></html>;
+  return <html lang="ro"><body className={`${serif.variable} ${sans.variable}`}><ServiceWorkerRegister />{children}<Analytics /></body></html>;
 }
