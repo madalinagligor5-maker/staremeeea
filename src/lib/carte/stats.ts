@@ -54,8 +54,8 @@ function iso(y: number, m: number, d: number) {
 }
 
 /** Calendarul unei luni (luna 1–12), pe săptămâni care încep luni. Celulele goale sunt null. */
-export function monthGrid(year: number, month: number, entries: readonly { entry_date: string; level: Level | null }[]): MonthCell[][] {
-  const byDate = new Map(entries.map((e) => [e.entry_date, e.level]));
+export function monthGrid(year: number, month: number, entries: readonly { date: string; level: Level | null }[]): MonthCell[][] {
+  const byDate = new Map(entries.map((e) => [e.date, e.level]));
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const offset = (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
   const cells: MonthCell[] = Array.from({ length: offset }, () => null);
