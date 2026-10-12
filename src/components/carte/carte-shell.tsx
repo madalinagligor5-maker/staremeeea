@@ -1,6 +1,6 @@
 "use client";
 // Cadrul aplicației Cartea: antet simplu și navigație (sus pe ecran mare, jos pe telefon).
-import { BarChart3, BookOpen, Layers, ShieldCheck } from "lucide-react";
+import { BarChart3, BookOpen, Gift, Layers, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -12,6 +12,7 @@ const nav = [
   [BookOpen, "Carte", "/carte"],
   [Layers, "Sertare", "/carte/sertare"],
   [BarChart3, "Statistici", "/carte/statistici"],
+  [Gift, "Bonusuri", "/carte/bonusuri"],
   [ShieldCheck, "Date", "/carte/date"],
 ] as const;
 
@@ -42,7 +43,7 @@ export function CarteShell({ children }: { children: React.ReactNode }) {
       </nav>
     </div></header>
     <main id="continut" className="mx-auto w-full max-w-2xl px-4 py-8 sm:py-10">{children}</main>
-    <nav aria-label="Navigația Cărții, pe telefon" className="mobile-dock" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+    <nav aria-label="Navigația Cărții, pe telefon" className="mobile-dock" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
       {nav.map(([Icon, label, href]) => { const active = isActive(pathname, href); return <Link aria-current={active ? "page" : undefined} className={`mobile-dock-link ${active ? "is-active" : ""}`} href={href} key={href}><Icon size={19} strokeWidth={active ? 2.2 : 1.6} aria-hidden="true" /><span>{label}</span></Link>; })}
     </nav>
     <InstallPrompt />

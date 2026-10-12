@@ -2,6 +2,7 @@ import { Check } from "lucide-react";
 import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { launchMode } from "@/lib/launch";
 
 const levels = [
   ["Zi bună", "Pagina completă: ce contează azi, ce lași pe mâine și un loc pentru tot ce îți vine în minte."],
@@ -21,8 +22,11 @@ export default function HomePage() {
       <div className="max-w-3xl">
         <h1 className="display text-[clamp(3.2rem,9vw,6.4rem)] font-semibold leading-[1.02] tracking-[-.035em] text-[var(--wine)]">Mai puțin de purtat.</h1>
         <p className="mt-7 max-w-[34em] text-xl leading-9 text-[var(--ink)]">Ritualul de azi este un sistem de organizare pentru zilele grele. Un singur loc pentru tot ce porți, cu trei niveluri de efort, ca să-l poți folosi și când nu mai ai putere.</p>
-        <a className="button-primary mt-9 !min-h-[52px] !px-7 !text-base" href="#lista">Vreau să aflu prima</a>
-        <p className="mt-4 text-sm text-[var(--muted)]">Lansăm în curând. Primești gratuit mini-pagina „Azi”.</p>
+        {launchMode === "pre"
+          ? <><a className="button-primary mt-9 !min-h-[52px] !px-7 !text-base" href="#lista">Vreau să aflu prima</a>
+            <p className="mt-4 text-sm text-[var(--muted)]">Lansăm în curând. Primești gratuit mini-pagina „Azi”.</p></>
+          : <><a className="button-primary mt-9 !min-h-[52px] !px-7 !text-base" href="/preturi">Încep cele 3 zile de probă</a>
+            <p className="mt-4 text-sm text-[var(--muted)]">Primele 3 zile sunt gratuite. Apoi 25 lei pe lună sau 225 lei pe an. Anulezi oricând.</p></>}
       </div>
     </section>
 

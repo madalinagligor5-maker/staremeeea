@@ -45,19 +45,34 @@ Setează rolul de admin dintr-un mediu server sigur:
 
 în `app_metadata` pentru utilizatoarea aleasă.
 
-## Stripe
+## Stripe și abonamentul Cartea
 
-1. Creează un produs Ritualul de Azi Plus și două Price-uri recurente (RON/lună și RON/an).
-2. Pune ID-urile în `STRIPE_PLUS_MONTHLY_PRICE_ID` și `STRIPE_PLUS_ANNUAL_PRICE_ID`.
-3. Configurează webhook-ul către `https://domeniul-tau/api/stripe/webhook` pentru:
+Abonamentul este de **25 lei pe lună** sau **225 lei pe an**, cu **3 zile de probă**. Prețul se creează chiar la plată (`price_data`, în RON), deci nu trebuie să definești produse în Stripe. Dacă totuși vrei să le controlezi din Dashboard, creează două Price-uri recurente și pune ID-urile în `STRIPE_CARTE_MONTHLY_PRICE_ID` și `STRIPE_CARTE_ANNUAL_PRICE_ID` (nu există valori implicite vechi: prețurile Plus nu se mai folosesc).
+
+1. Pune cheia în `STRIPE_SECRET_KEY` (preferă o cheie restricționată `rk_…`).
+2. Configurează webhook-ul către `https://domeniul-tau/api/stripe/webhook` pentru:
    - `checkout.session.completed`
+   - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
    - `invoice.payment_failed`
-4. Pune signing secret în `STRIPE_WEBHOOK_SECRET`.
-5. Configurează Customer Portal din Stripe Dashboard.
+3. Pune signing secret în `STRIPE_WEBHOOK_SECRET`.
+4. În Customer Portal (Dashboard) activează anularea abonamentului, schimbarea cardului și, dacă vrei, trecerea de la lunar la anual.
+5. Proba cere card implicit. Pentru probă fără card setează `CARTE_TRIAL_CARD=optional`: proba pornește fără card și se anulează singură dacă nu adaugi unul.
 
-Accesul Plus nu se acordă în success page; starea abonamentului este actualizată numai după verificarea semnăturii webhook. Preferă o cheie restricționată `rk_…` cu permisiunile minime necesare.
+Proba de 3 zile se acordă o singură dată pe cont. Accesul nu se acordă în pagina de succes: starea abonamentului este scrisă numai de webhook, după verificarea semnăturii. Au acces stările `trialing`, `active` și `past_due`.
+
+## Lansarea Cărții, pas cu pas
+
+Până la lansare, site-ul arată pagina de lansare și lista de așteptare, iar `/carte` este deschisă și gratuită (testare). La lansare:
+
+1. Aplică migrările Supabase și verifică tabelul `subscriptions`.
+2. Setează în Cloudflare: `STRIPE_*`, `SUPABASE_*`, `RESEND_*`.
+3. Setează `NEXT_PUBLIC_LAUNCH_MODE=carte` (variabilă de build: se aplică la următorul `npm run deploy`). Se deschid Prețurile, înregistrarea și autentificarea; instrumentele vechi (`/spatiu`, `/instrumente`, `/resurse`, `/blog`) rămân ascunse.
+4. Setează `CARTE_PAYWALL=on` (variabilă de server). De atunci, Cartea, Sertarele, Setările și Bonusurile cer abonament activ. Datele și Statisticile rămân deschise: cine și-a anulat abonamentul își poate citi și exporta ce a scris.
+5. Testează cu un cont nou: înregistrare, confirmare email, plată de test în Stripe, acces la `/carte`, anulare din portal.
+
+Bonusurile PDF se generează cu `python3 scripts/bonusuri.py` (rezultat în `public/bonusuri`). Fișierele sunt publice dacă cineva are linkul exact; pagina `/carte/bonusuri` le listează doar abonaților.
 
 ## Resend
 
@@ -80,7 +95,7 @@ npm run deploy
 
 - revizuire juridică pentru Termeni, Confidențialitate, cookies și baza legală GDPR;
 - politicile RLS verificate cu conturi distincte și Supabase advisors;
-- webhook Stripe testat pentru toate cele patru evenimente și retry/idempotency;
+- webhook Stripe testat pentru toate cele cinci evenimente și retry/idempotency;
 - autentificarea și rate-limitarea endpointurilor sensibile verificate în mediul Cloudflare;
 - iconuri PNG maskable 192/512 și capturi PWA adăugate pentru toate magazinele vizate;
 - accesibilitate testată cu tastatură, cititor de ecran și zoom 200%;

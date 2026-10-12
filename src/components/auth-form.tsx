@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { launchMode } from "@/lib/launch";
+
+/** Doar căi din acest site, ca să nu trimitem utilizatorul în altă parte. */
+function safeNext(value: string | null): string | null {
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : null;
+}
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [show, setShow] = useState(false); const [busy, setBusy] = useState(false); const [message, setMessage] = useState(""); const [error, setError] = useState(""); const router = useRouter();
@@ -11,11 +17,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     e.preventDefault(); setBusy(true); setError(""); setMessage(""); const form = new FormData(e.currentTarget); const email = String(form.get("email")); const password = String(form.get("password")); const firstName = String(form.get("firstName") || ""); const supabase = createClient();
     if (!supabase) { setError("Configurează Supabase în .env.local pentru a activa autentificarea."); setBusy(false); return; }
     if (mode === "signup") {
-      const { error: authError } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}/auth/callback?next=/onboarding`, data: { first_name: firstName } } });
-      if (authError) setError(authError.message); else setMessage("Verifică-ți inboxul pentru a confirma adresa. Apoi spațiul tău va fi pregătit.");
+      const { error: authError } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}/auth/callback?next=${launchMode === "off" ? "/onboarding" : "/preturi"}`, data: { first_name: firstName } } });
+      if (authError) setError(authError.message); else setMessage(launchMode === "off" ? "Verifică-ți inboxul pentru a confirma adresa. Apoi spațiul tău va fi pregătit." : "Verifică-ți inboxul pentru a confirma adresa. Apoi alegi planul și începi cele 3 zile de probă.");
     } else {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-      if (authError) setError("Emailul sau parola nu sunt corecte."); else { router.push("/spatiu/azi"); router.refresh(); }
+      if (authError) setError("Emailul sau parola nu sunt corecte."); else { router.push(safeNext(new URLSearchParams(location.search).get("next")) ?? (launchMode === "off" ? "/spatiu/azi" : "/carte")); router.refresh(); }
     }
     setBusy(false);
   }

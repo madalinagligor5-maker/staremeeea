@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { mergeDocs } from "@/lib/carte/drawers";
 import { makeBackup, mergeEntries, parseBackupContents } from "@/lib/carte/entries";
+import { exportReadable } from "@/lib/carte/readable";
 import { loadSettings, saveSettings } from "@/lib/carte/settings";
 import { clearAll, listDocs, listEntries, requestPersistence, saveDoc, saveEntry } from "@/lib/carte/storage";
+import { AccountSection } from "./account-section";
 
 type Notice = { kind: "ok" | "error"; text: string } | null;
 
@@ -46,6 +48,24 @@ export function BackupView() {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNotice({ kind: "ok", text: `Copia de rezervă are ${entries.length} ${entries.length === 1 ? "zi" : "zile"}. Păstrează fișierul într-un loc sigur.` });
     } catch { setNotice({ kind: "error", text: "Nu am putut crea copia de rezervă." }); }
+  }
+
+  async function exportText() {
+    try {
+      const [entries, docs] = await Promise.all([listEntries(), listDocs()]);
+      const settings = loadSettings();
+      const text = exportReadable(entries, docs, settings.updatedAt > 0 ? settings : null);
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ritualul-de-azi-text-${new Date().toISOString().slice(0, 10)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice({ kind: "ok", text: "Am creat un fișier text cu tot ce ai scris. Îl poți deschide în orice aplicație, fără Cartea." });
+    } catch { setNotice({ kind: "error", text: "Nu am putut crea fișierul text." }); }
   }
 
   async function importData(file: File | undefined) {
@@ -95,13 +115,16 @@ export function BackupView() {
 
     <section className={card} aria-labelledby="rezerva">
       <h2 id="rezerva" className={h2}>Copie de rezervă</h2>
-      <p className="mt-2 leading-7 text-[var(--muted)]">Salvează un fișier cu toate zilele, sertarele și setările tale. Dacă schimbi telefonul sau ștergi datele browserului, îl poți aduce înapoi. Merită făcută o dată pe lună.</p>
+      <p className="mt-2 leading-7 text-[var(--muted)]">Salvează un fișier cu toate zilele, sertarele și setările tale. Dacă schimbi telefonul sau ștergi datele browserului, îl poți aduce înapoi. Merită făcută o dată pe lună. „Descarc ca text” creează un fișier simplu, pe care îl citești oricând, chiar și fără Cartea.</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" onClick={exportData} className="button-primary">Salvează o copie</button>
+        <button type="button" onClick={exportText} className="button-secondary">Descarc ca text</button>
         <button type="button" onClick={() => fileRef.current?.click()} className="button-secondary">Aduc o copie înapoi</button>
         <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-label="Alege fișierul cu copia de rezervă" onChange={(e) => void importData(e.target.files?.[0])} />
       </div>
     </section>
+
+    <AccountSection />
 
     <section className={card} aria-labelledby="ecran">
       <h2 id="ecran" className={h2}>Pe ecranul telefonului</h2>
