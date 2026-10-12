@@ -1,5 +1,5 @@
 "use client";
-// Cele trei pagini ale zilei: Azi (se adaptează nivelului), Acum (descărcare din cap) și Seara.
+// Paginile zilei: Azi (se adaptează nivelului), Acum (descărcare din cap), Seara și Resetare (după o pauză).
 import type { PageFields } from "@/lib/carte/entries";
 import type { Level } from "@/lib/carte/stats";
 import { Panel, TaskRow, TextArea, TextLine } from "./fields";
@@ -92,5 +92,24 @@ export function SearaPage({ fields, set }: PageProps) {
       <TextArea id="seara-las" label="Ce las aici" hideLabel value={s("las_aici")} onChange={(v) => set("las_aici", v)} rows={3} />
     </Panel>
     <p className="px-1 text-sm text-[var(--muted)]">Poți lăsa totul gol. Și asta e o seară.</p>
+  </div>;
+}
+
+export function ResetPage({ fields, set, pauseDays, onStart }: PageProps & { pauseDays: number | null; onStart: () => void }) {
+  const { s } = reader(fields);
+  return <div className="space-y-5">
+    <Panel title="Bine ai revenit" hint={pauseDays !== null && pauseDays > 1 ? `Au trecut ${pauseDays} zile de la ultima pagină. Nu trebuie să recuperezi nimic.` : "Nu trebuie să recuperezi nimic. Poți începe de aici, oricând."} tone="soft">
+      <p className="leading-7 text-[var(--muted)]">Trei pași mici. Poți sări peste oricare.</p>
+    </Panel>
+    <Panel title="1. Ce s-a întâmplat?" hint="O propoziție, fără explicații.">
+      <TextLine id="reset-ce" label="Ce s-a întâmplat" hideLabel value={s("reset_ce")} onChange={(v) => set("reset_ce", v)} />
+    </Panel>
+    <Panel title="2. Ce pot lăsa jos?" hint="Ce nu mai porți din lista veche. Poate rămâne acolo, nu trebuie făcut.">
+      <TextArea id="reset-jos" label="Ce pot lăsa jos" hideLabel value={s("reset_jos")} onChange={(v) => set("reset_jos", v)} rows={3} />
+    </Panel>
+    <Panel title="3. Un singur lucru pentru azi" hint="Atât. Pagina se deschide pe nivelul Zi grea.">
+      <TextLine id="reset-unu" label="Un singur lucru pentru azi" hideLabel value={s("reset_unu")} onChange={(v) => set("reset_unu", v)} placeholder="Ce ar fi destul azi?" />
+      <button type="button" onClick={onStart} className="button-primary mt-2">Deschid pagina Azi</button>
+    </Panel>
   </div>;
 }

@@ -3,19 +3,24 @@
 // Totul se salvează automat, în IndexedDB, pe acest dispozitiv. Nimic nu se trimite pe server.
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { emptyEntry, type DayEntry, type PageFields } from "@/lib/carte/entries";
-import { formatLong, isIsoDate, shiftDate, todayLocal } from "@/lib/carte/dates";
+import { emptyEntry, entryTexts, type DayEntry, type PageFields } from "@/lib/carte/entries";
+import { daysBetween, formatLong, isIsoDate, shiftDate, todayLocal } from "@/lib/carte/dates";
 import { levelColors, levelLabels, type Level } from "@/lib/carte/stats";
-import { getEntry, requestPersistence, saveEntry } from "@/lib/carte/storage";
-import { AcumPage, AziPage, SearaPage } from "./pages";
+import { getEntry, listEntries, requestPersistence, saveEntry } from "@/lib/carte/storage";
+import { AcumPage, AziPage, ResetPage, SearaPage } from "./pages";
 
-type PageKey = "azi" | "acum" | "seara";
+type StoredPage = "azi" | "acum" | "seara"; // pagini care au câmpuri proprii în intrarea zilei
+type PageKey = StoredPage | "resetare"; // Resetarea își ține câmpurile în pagina Acum (chei reset_*)
+
+// Dacă ultima pagină are cel puțin atâtea zile, Cartea se deschide pe Resetare.
+const PAUSE_DAYS = 3;
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 const tabs: { id: PageKey; label: string }[] = [
   { id: "azi", label: "Azi" },
   { id: "acum", label: "Acum" },
   { id: "seara", label: "Seara" },
+  { id: "resetare", label: "Resetare" },
 ];
 
 const levels: { id: Level; hint: string }[] = [
@@ -34,6 +39,7 @@ export function DayBook() {
   const [entry, setEntry] = useState<DayEntry | null>(null);
   const [page, setPage] = useState<PageKey>("azi");
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [pauseDays, setPauseDays] = useState<number | null>(null);
   const entryRef = useRef<DayEntry | null>(null);
   const pending = useRef<DayEntry | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,6 +61,24 @@ export function DayBook() {
     void requestPersistence();
     return () => window.removeEventListener("hashchange", onHash);
   }, [flush]);
+
+  // După o pauză, Cartea se deschide pe Resetare, o singură dată și doar pe ziua de azi.
+  useEffect(() => {
+    let cancelled = false;
+    listEntries().then((all) => {
+      if (cancelled) return;
+      const today = todayLocal();
+      const used = all.filter((e) => e.date < today && (e.level !== null || entryTexts(e).length > 0)).map((e) => e.date).sort();
+      const last = used[used.length - 1];
+      if (!last) return;
+      const gap = daysBetween(last, today);
+      if (gap >= PAUSE_DAYS) {
+        setPauseDays(gap);
+        if (dateFromHash() === today) setPage("resetare");
+      }
+    }).catch(() => { /* fără istoric, nu apare Resetarea singură */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Încarcă intrarea zilei alese.
   useEffect(() => {
@@ -89,8 +113,17 @@ export function DayBook() {
     timer.current = setTimeout(flush, 500);
   }, [flush]);
 
-  const patchPage = (which: PageKey, patch: PageFields) => apply((e) => ({ ...e, [which]: { ...e[which], ...patch } }) as DayEntry);
+  const patchPage = (which: StoredPage, patch: PageFields) => apply((e) => ({ ...e, [which]: { ...e[which], ...patch } }) as DayEntry);
   const setLevel = (level: Level) => apply((e) => ({ ...e, level: e.level === level ? null : level }));
+
+  function startFromReset() {
+    apply((e) => {
+      const one = typeof e.acum.reset_unu === "string" ? e.acum.reset_unu.trim() : "";
+      const hasOne = typeof e.azi.grea_lucru === "string" && e.azi.grea_lucru.trim() !== "";
+      return { ...e, level: "grea", azi: one !== "" && !hasOne ? { ...e.azi, grea_lucru: one } : e.azi };
+    });
+    setPage("azi");
+  }
 
   function go(next: string) {
     if (!isIsoDate(next) || next === date) return;
@@ -101,8 +134,8 @@ export function DayBook() {
 
   if (!date) return <div className="min-h-[60vh]" aria-busy="true" />;
   const today = todayLocal();
-  const fieldsFor = (which: PageKey): PageFields => (entry ? entry[which] : {});
-  const common = (which: PageKey) => ({
+  const fieldsFor = (which: StoredPage): PageFields => (entry ? entry[which] : {});
+  const common = (which: StoredPage) => ({
     fields: fieldsFor(which),
     set: (key: string, value: string | boolean) => patchPage(which, { [key]: value }),
     setMany: (patch: PageFields) => patchPage(which, patch),
@@ -141,15 +174,16 @@ export function DayBook() {
       </div>
     </div>
 
-    <div role="tablist" aria-label="Paginile zilei" className="grid grid-cols-3 gap-1 rounded-full bg-[var(--blush)] p-1">
+    <div role="tablist" aria-label="Paginile zilei" className="grid grid-cols-4 gap-1 rounded-full bg-[var(--blush)] p-1">
       {tabs.map((t) => <button key={t.id} type="button" role="tab" id={`tab-${t.id}`} aria-selected={page === t.id} aria-controls="pagina-zilei" onClick={() => setPage(t.id)}
-        className={`min-h-11 rounded-full text-sm font-extrabold transition-colors ${page === t.id ? "bg-[var(--wine)] text-white" : "text-[var(--wine)]"}`}>{t.label}</button>)}
+        className={`min-h-11 rounded-full px-1 text-xs font-extrabold transition-colors sm:text-sm ${page === t.id ? "bg-[var(--wine)] text-white" : "text-[var(--wine)]"}`}>{t.label}</button>)}
     </div>
 
     <div id="pagina-zilei" role="tabpanel" aria-labelledby={`tab-${page}`} aria-busy={!entry}>
       {!entry ? <p className="py-10 text-center text-[var(--muted)]">Se deschide pagina…</p>
         : page === "azi" ? <AziPage {...common("azi")} level={entry.level} />
         : page === "acum" ? <AcumPage {...common("acum")} />
+        : page === "resetare" ? <ResetPage {...common("acum")} pauseDays={pauseDays} onStart={startFromReset} />
         : <SearaPage {...common("seara")} />}
     </div>
 

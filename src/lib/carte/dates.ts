@@ -41,3 +41,40 @@ export function formatShort(date: string): string {
   const [, m, d] = parts(date);
   return `${d} ${monthNames[m - 1]}`;
 }
+
+/** Luni din săptămâna în care cade data. */
+export function mondayOf(date: string): string {
+  const [y, m, d] = parts(date);
+  const dow = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+  return shiftDate(date, -dow);
+}
+
+/** Numărul de zile dintre două date (b - a). */
+export function daysBetween(a: string, b: string): number {
+  const [ya, ma, da] = parts(a);
+  const [yb, mb, db] = parts(b);
+  return Math.round((Date.UTC(yb, mb - 1, db) - Date.UTC(ya, ma - 1, da)) / 86400000);
+}
+
+/** Luna unei date, ca „2026-10”. */
+export function monthOf(date: string): string {
+  return date.slice(0, 7);
+}
+
+/** Mută o lună „YYYY-MM” cu un număr de luni. */
+export function shiftMonth(period: string, delta: number): string {
+  const [y, m] = period.split("-").map(Number);
+  const index = y * 12 + (m - 1) + delta;
+  return `${Math.floor(index / 12)}-${pad((index % 12) + 1)}`;
+}
+
+/** „octombrie 2026” */
+export function formatMonth(period: string): string {
+  const [y, m] = period.split("-").map(Number);
+  return `${monthNames[m - 1]} ${y}`;
+}
+
+/** „5 octombrie – 11 octombrie” pentru săptămâna care începe la data dată. */
+export function formatWeek(monday: string): string {
+  return `${formatShort(monday)} – ${formatShort(shiftDate(monday, 6))}`;
+}

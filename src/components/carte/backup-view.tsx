@@ -1,8 +1,10 @@
 "use client";
 // Datele tale: copie de rezervă, restaurare, ștergere. Totul rămâne pe acest dispozitiv.
 import { useEffect, useRef, useState } from "react";
-import { makeBackup, mergeEntries, parseBackup } from "@/lib/carte/entries";
-import { clearAll, listEntries, requestPersistence, saveEntry } from "@/lib/carte/storage";
+import { mergeDocs } from "@/lib/carte/drawers";
+import { makeBackup, mergeEntries, parseBackupContents } from "@/lib/carte/entries";
+import { loadSettings, saveSettings } from "@/lib/carte/settings";
+import { clearAll, listDocs, listEntries, requestPersistence, saveDoc, saveEntry } from "@/lib/carte/storage";
 
 type Notice = { kind: "ok" | "error"; text: string } | null;
 
@@ -30,7 +32,9 @@ export function BackupView() {
   async function exportData() {
     try {
       const entries = await listEntries();
-      const backup = makeBackup(entries);
+      const docs = await listDocs();
+      const settings = loadSettings();
+      const backup = makeBackup(entries, new Date(), { drawers: docs, settings: settings.updatedAt > 0 ? settings : null });
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -47,13 +51,21 @@ export function BackupView() {
   async function importData(file: File | undefined) {
     if (!file) return;
     try {
-      const incoming = parseBackup(await file.text());
+      const incoming = parseBackupContents(await file.text());
       const existing = await listEntries();
-      const merged = mergeEntries(existing, incoming);
+      const merged = mergeEntries(existing, incoming.entries);
       const have = new Map(existing.map((e) => [e.date, e.updatedAt]));
       const changed = merged.filter((e) => have.get(e.date) !== e.updatedAt);
       for (const e of changed) await saveEntry(e);
-      setNotice({ kind: "ok", text: changed.length === 0 ? "Totul din fișier era deja aici." : `Am adus ${changed.length} ${changed.length === 1 ? "zi" : "zile"}. Pentru aceeași zi rămâne varianta mai recentă.` });
+      const existingDocs = await listDocs();
+      const mergedDocs = mergeDocs(existingDocs, incoming.drawers);
+      const haveDocs = new Map(existingDocs.map((d) => [d.key, d.updatedAt]));
+      const changedDocs = mergedDocs.filter((d) => haveDocs.get(d.key) !== d.updatedAt);
+      for (const d of changedDocs) await saveDoc(d);
+      let settingsBrought = false;
+      if (incoming.settings && incoming.settings.updatedAt > loadSettings().updatedAt) { saveSettings(incoming.settings); settingsBrought = true; }
+      const total = changed.length + changedDocs.length;
+      setNotice({ kind: "ok", text: total === 0 && !settingsBrought ? "Totul din fișier era deja aici." : `Am adus ${changed.length} ${changed.length === 1 ? "zi" : "zile"}${changedDocs.length > 0 ? `, ${changedDocs.length} ${changedDocs.length === 1 ? "pagină de sertar" : "pagini de sertar"}` : ""}${settingsBrought ? " și setările" : ""}. Pentru aceeași pagină rămâne varianta mai recentă.` });
       await refresh();
     } catch (error) {
       setNotice({ kind: "error", text: error instanceof Error ? error.message : "Nu am putut citi fișierul." });
@@ -83,7 +95,7 @@ export function BackupView() {
 
     <section className={card} aria-labelledby="rezerva">
       <h2 id="rezerva" className={h2}>Copie de rezervă</h2>
-      <p className="mt-2 leading-7 text-[var(--muted)]">Salvează un fișier cu toate zilele tale. Dacă schimbi telefonul sau ștergi datele browserului, îl poți aduce înapoi. Merită făcută o dată pe lună.</p>
+      <p className="mt-2 leading-7 text-[var(--muted)]">Salvează un fișier cu toate zilele, sertarele și setările tale. Dacă schimbi telefonul sau ștergi datele browserului, îl poți aduce înapoi. Merită făcută o dată pe lună.</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" onClick={exportData} className="button-primary">Salvează o copie</button>
         <button type="button" onClick={() => fileRef.current?.click()} className="button-secondary">Aduc o copie înapoi</button>
@@ -98,7 +110,7 @@ export function BackupView() {
 
     <section className={card} aria-labelledby="sterge">
       <h2 id="sterge" className={h2}>Șterge tot</h2>
-      <p className="mt-2 leading-7 text-[var(--muted)]">Șterge toate zilele de pe acest dispozitiv. Nu se poate desface, decât dacă ai o copie de rezervă.</p>
+      <p className="mt-2 leading-7 text-[var(--muted)]">Șterge toate zilele, sertarele și setările de pe acest dispozitiv. Nu se poate desface, decât dacă ai o copie de rezervă.</p>
       {!confirming
         ? <button type="button" onClick={() => setConfirming(true)} className="button-secondary mt-4">Vreau să șterg tot</button>
         : <div className="mt-4 space-y-3" role="group" aria-label="Confirmare ștergere">
