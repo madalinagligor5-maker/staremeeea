@@ -12,7 +12,41 @@
   --ink: #3b2a36;
   --muted: #6b5766;
   --line: rgba(67, 45, 61, 0.16);
+  --lv-buna-bg: #86495e; --lv-buna-fg: #f6efe6;
+  --lv-obosita-bg: #c99aa5; --lv-obosita-fg: #432d3d;
+  --lv-grea-bg: #ebd6da; --lv-grea-fg: #432d3d;
 }
+
+/* Paletele alese de utilizator în Cartea. Prună este cea de mai sus. */
+:root[data-theme="salvie"] {
+  --ivory: #f1f1ea; --paper: #f8f8f2; --blush: #dfe5d9; --rose-soft: #a9b9a3; --rose: #55705a; --rose-dark: #3f5944;
+  --wine: #263a2e; --sage: #a6b1a0; --ink: #26332b; --muted: #55665b; --line: rgba(38, 58, 46, 0.18);
+  --lv-buna-bg: #55705a; --lv-buna-fg: #f6f8f2; --lv-obosita-bg: #a9b9a3; --lv-obosita-fg: #263a2e; --lv-grea-bg: #dfe5d9; --lv-grea-fg: #263a2e;
+}
+:root[data-theme="nisip"] {
+  --ivory: #f5ede0; --paper: #fbf5ea; --blush: #ecdcc3; --rose-soft: #d1a58a; --rose: #a2573a; --rose-dark: #82432b;
+  --wine: #4a2d22; --sage: #b4a98e; --ink: #3d2a21; --muted: #6a5346; --line: rgba(74, 45, 34, 0.18);
+  --lv-buna-bg: #a2573a; --lv-buna-fg: #fbf5ea; --lv-obosita-bg: #d1a58a; --lv-obosita-fg: #4a2d22; --lv-grea-bg: #ecdcc3; --lv-grea-fg: #4a2d22;
+}
+:root[data-theme="mare"] {
+  --ivory: #eef1f4; --paper: #f7f9fb; --blush: #d9e2ea; --rose-soft: #9db4c7; --rose: #3f6785; --rose-dark: #2f4f69;
+  --wine: #1f3347; --sage: #a3b4bf; --ink: #1f2d3a; --muted: #4f6275; --line: rgba(31, 51, 71, 0.18);
+  --lv-buna-bg: #3f6785; --lv-buna-fg: #f4f7fa; --lv-obosita-bg: #9db4c7; --lv-obosita-fg: #1f3347; --lv-grea-bg: #d9e2ea; --lv-grea-fg: #1f3347;
+}
+
+/* Discul zilei: se micșorează odată cu nivelul ales. Nu e un scor, e doar cât ai de purtat azi. */
+.orb { position: relative; display: grid; width: 7rem; height: 7rem; flex: none; place-items: center; }
+.orb-core { width: 100%; height: 100%; border-radius: 50%; transition: transform .6s cubic-bezier(.3,.7,.2,1), background-color .6s ease, box-shadow .6s ease; }
+.orb-core[data-level="none"] { transform: scale(.82); background: transparent; border: 2px dashed var(--rose-soft); box-shadow: none; }
+.orb-core[data-level="buna"] { transform: scale(1); background: var(--lv-buna-bg); box-shadow: 0 0 0 10px color-mix(in srgb, var(--lv-buna-bg) 16%, transparent), 0 0 0 22px color-mix(in srgb, var(--lv-buna-bg) 8%, transparent); }
+.orb-core[data-level="obosita"] { transform: scale(.7); background: var(--lv-obosita-bg); box-shadow: 0 0 0 9px color-mix(in srgb, var(--lv-obosita-bg) 26%, transparent); }
+.orb-core[data-level="grea"] { transform: scale(.42); background: var(--rose); box-shadow: 0 0 0 7px color-mix(in srgb, var(--rose) 18%, transparent); }
+
+.day-hero { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 1.75rem; background: linear-gradient(160deg, var(--paper), color-mix(in srgb, var(--blush) 70%, var(--paper))); padding: 1.35rem; }
+.day-hero::after { content: ""; position: absolute; inset: auto -4rem -6rem auto; width: 15rem; height: 15rem; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--rose-soft) 38%, transparent), transparent 68%); pointer-events: none; }
+.chip { min-height: 2.75rem; border-radius: 999px; border: 1px solid var(--line); background: white; padding: .5rem 1rem; font-size: .9rem; font-weight: 700; color: var(--wine); transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
+.chip[aria-pressed="true"], .chip[aria-checked="true"] { border-color: var(--wine); background: var(--wine); color: white; }
+.breath { width: 9rem; height: 9rem; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--rose-soft), var(--rose)); }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--ivory); }

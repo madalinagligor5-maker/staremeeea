@@ -4,11 +4,11 @@ export type Level = "buna" | "obosita" | "grea";
 
 export const levelLabels: Record<Level, string> = { buna: "Zi bună", obosita: "Zi obosită", grea: "Zi grea" };
 
-// Nuanțe din brand, de la plin (zi bună) la deschis (zi grea).
+// Nuanțe din paleta aleasă (variabile CSS), de la plin (zi bună) la deschis (zi grea).
 export const levelColors: Record<Level, { bg: string; fg: string }> = {
-  buna: { bg: "#86495E", fg: "#F6EFE6" },
-  obosita: { bg: "#C99AA5", fg: "#432D3D" },
-  grea: { bg: "#EBD6DA", fg: "#432D3D" },
+  buna: { bg: "var(--lv-buna-bg)", fg: "var(--lv-buna-fg)" },
+  obosita: { bg: "var(--lv-obosita-bg)", fg: "var(--lv-obosita-fg)" },
+  grea: { bg: "var(--lv-grea-bg)", fg: "var(--lv-grea-fg)" },
 };
 
 const stopwords = new Set(

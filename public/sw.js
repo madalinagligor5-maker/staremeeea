@@ -1,5 +1,5 @@
 // Memorează paginile deschise, ca aplicația să pornească și fără internet. Datele Cărții sunt în IndexedDB, nu aici.
-const CACHE = "ritualul-de-azi-v2";
+const CACHE = "ritualul-de-azi-v3";
 const SHELL = ["/offline", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))));

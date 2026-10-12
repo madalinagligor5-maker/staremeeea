@@ -1,8 +1,11 @@
 "use client";
 // Paginile zilei: Azi (se adaptează nivelului), Acum (descărcare din cap), Seara și Resetare (după o pauză).
 import type { PageFields } from "@/lib/carte/entries";
+import { todayLimit } from "@/lib/carte/profile";
+import type { ModuleId } from "@/lib/carte/settings";
 import type { Level } from "@/lib/carte/stats";
 import { Panel, TaskRow, TextArea, TextLine } from "./fields";
+import { BodyCheckin, FocusTimer, Wins } from "./modules";
 
 export type PageProps = {
   fields: PageFields;
@@ -17,17 +20,20 @@ function reader(fields: PageFields) {
   };
 }
 
-export function AziPage({ fields, set, level }: PageProps & { level: Level | null }) {
+export function AziPage({ fields, set, level, modules, wins }: PageProps & { level: Level | null; modules: readonly ModuleId[]; wins: readonly string[] }) {
   const { s, b } = reader(fields);
   if (!level) {
     return <p className="rounded-2xl border hairline bg-[var(--paper)] p-5 leading-7 text-[var(--muted)]">Alege mai sus cum ești azi. Pagina se adaptează: cu cât ziua e mai grea, cu atât cere mai puțin.</p>;
   }
   const tired = level === "obosita" || level === "buna";
   const good = level === "buna";
+  const timerTask = level === "grea" ? s("grea_lucru") : s("esential_1") || s("grea_lucru");
   return <div className="space-y-5">
+    {modules.includes("corp") && <BodyCheckin fields={fields} set={set} />}
     <Panel title="Un singur lucru pentru azi" hint={level === "grea" ? "O bifă și un singur lucru. Atât. Restul poate rămâne gol." : "Dacă ar rămâne doar unul."}>
       <TaskRow id="azi-grea" label="Un singur lucru pentru azi" text={s("grea_lucru")} done={b("grea_gata")} onText={(v) => set("grea_lucru", v)} onDone={(v) => set("grea_gata", v)} placeholder="Ce contează cel mai mult azi?" />
     </Panel>
+    {modules.includes("cronometru") && <FocusTimer level={level} task={timerTask} />}
     {tired && <Panel title="Cele 3 lucruri care contează" hint="Trei lucruri, nu mai mult. Restul poate aștepta.">
       {[1, 2, 3].map((i) => <TaskRow key={i} id={`azi-esential-${i}`} label={`Lucrul ${i} din 3`} text={s(`esential_${i}`)} done={b(`esential_${i}_gata`)} onText={(v) => set(`esential_${i}`, v)} onDone={(v) => set(`esential_${i}_gata`, v)} />)}
       <div className="pt-2"><TextLine id="azi-pot-astepta" label="Pot aștepta" value={s("pot_astepta")} onChange={(v) => set("pot_astepta", v)} placeholder="Ce las conștient pe mâine" /></div>
@@ -43,6 +49,7 @@ export function AziPage({ fields, set, level }: PageProps & { level: Level | nul
         {[1, 2].map((i) => <TaskRow key={i} id={`azi-alti-${i}`} label={`Pentru alții, rândul ${i}`} text={s(`alti_${i}`)} done={b(`alti_${i}_gata`)} onText={(v) => set(`alti_${i}`, v)} onDone={(v) => set(`alti_${i}_gata`, v)} />)}
       </Panel>
     </>}
+    {modules.includes("castiguri") && <Wins wins={wins} fields={fields} set={set} />}
     <p className="px-1 text-sm text-[var(--muted)]">Folosește cât poți. Te poți opri oricând.</p>
   </div>;
 }
@@ -53,8 +60,9 @@ const choices = [
   { id: "nu", label: "Nu mai port" },
 ] as const;
 
-export function AcumPage({ fields, set, setMany }: PageProps) {
+export function AcumPage({ fields, set, setMany, level, picked, over, onSend }: PageProps & { level: Level | null; picked: number; over: number; onSend: () => void }) {
   const { s, b } = reader(fields);
+  const limit = todayLimit(level);
   function choose(row: number, which: (typeof choices)[number]["id"]) {
     const on = b(`rand_${row}_${which}`);
     setMany({ [`rand_${row}_azi`]: false, [`rand_${row}_tarziu`]: false, [`rand_${row}_nu`]: false, [`rand_${row}_${which}`]: !on });
@@ -74,6 +82,8 @@ export function AcumPage({ fields, set, setMany }: PageProps) {
           })}
         </div>
       </div>)}
+      {over > 0 && <p role="status" className="rounded-xl bg-white/70 p-3 text-sm font-bold text-[var(--wine)]">Ai ales mai mult decât ajunge azi ({limit} {limit === 1 ? "lucru" : "lucruri"}). Restul poate aștepta. Mută ce nu e urgent pe „Mai târziu”.</p>}
+      {picked > 0 && <button type="button" onClick={onSend} className="button-primary mt-1">Trec alegerile în pagina Azi</button>}
     </Panel>
     <p className="px-1 text-sm text-[var(--muted)]">Ce ai lăsat aici nu mai e doar în capul tău.</p>
   </div>;

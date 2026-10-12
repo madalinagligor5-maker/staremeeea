@@ -1,5 +1,5 @@
-import { DayBook } from "@/components/carte/day-book";
+import { CarteHome } from "@/components/carte/home";
 
 export default function CartePage() {
-  return <DayBook />;
+  return <CarteHome />;
 }

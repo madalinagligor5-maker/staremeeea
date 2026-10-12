@@ -3,8 +3,10 @@
 import { BarChart3, BookOpen, Layers, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Logo } from "@/components/logo";
+import { applyPalette, loadSettings, SETTINGS_EVENT, type Settings } from "@/lib/carte/settings";
 
 const nav = [
   [BookOpen, "Carte", "/carte"],
@@ -22,6 +24,15 @@ function isActive(pathname: string, href: string): boolean {
 
 export function CarteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  // Paleta aleasă se aplică pe toată Cartea și se schimbă pe loc, când o modifici în Setări.
+  useEffect(() => {
+    applyPalette(loadSettings().palette);
+    const onChange = (e: Event) => { const detail = (e as CustomEvent<Settings>).detail; if (detail) applyPalette(detail.palette); };
+    window.addEventListener(SETTINGS_EVENT, onChange);
+    return () => { window.removeEventListener(SETTINGS_EVENT, onChange); document.documentElement.removeAttribute("data-theme"); };
+  }, []);
+
   return <div className="min-h-[100dvh] bg-[var(--ivory)] pb-28 md:pb-0">
     <a href="#continut" className="skip-link">Sari la conținut</a>
     <header className="app-header"><div className="container-shell flex min-h-20 items-center justify-between gap-5">

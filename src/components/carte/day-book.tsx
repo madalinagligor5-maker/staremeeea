@@ -5,7 +5,10 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { emptyEntry, entryTexts, type DayEntry, type PageFields } from "@/lib/carte/entries";
 import { daysBetween, formatLong, isIsoDate, shiftDate, todayLocal } from "@/lib/carte/dates";
+import { defaultPage, greeting, subline } from "@/lib/carte/profile";
+import type { Settings } from "@/lib/carte/settings";
 import { levelColors, levelLabels, type Level } from "@/lib/carte/stats";
+import { overLimit, pickedForToday, placePicked } from "@/lib/carte/today";
 import { getEntry, listEntries, requestPersistence, saveEntry } from "@/lib/carte/storage";
 import { AcumPage, AziPage, ResetPage, SearaPage } from "./pages";
 
@@ -34,10 +37,11 @@ function dateFromHash(): string {
   return isIsoDate(hash) ? hash : todayLocal();
 }
 
-export function DayBook() {
+export function DayBook({ settings }: { settings: Settings }) {
   const [date, setDate] = useState<string>("");
   const [entry, setEntry] = useState<DayEntry | null>(null);
-  const [page, setPage] = useState<PageKey>("azi");
+  const [page, setPage] = useState<PageKey>(() => defaultPage(settings.moment, new Date().getHours()));
+  const [yesterday, setYesterday] = useState<Level | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [pauseDays, setPauseDays] = useState<number | null>(null);
   const entryRef = useRef<DayEntry | null>(null);
@@ -68,6 +72,8 @@ export function DayBook() {
     listEntries().then((all) => {
       if (cancelled) return;
       const today = todayLocal();
+      const prev = all.find((e) => e.date === shiftDate(today, -1));
+      setYesterday(prev ? prev.level : null);
       const used = all.filter((e) => e.date < today && (e.level !== null || entryTexts(e).length > 0)).map((e) => e.date).sort();
       const last = used[used.length - 1];
       if (!last) return;
@@ -125,6 +131,11 @@ export function DayBook() {
     setPage("azi");
   }
 
+  function sendToToday() {
+    apply((e) => placePicked(e));
+    setPage("azi");
+  }
+
   function go(next: string) {
     if (!isIsoDate(next) || next === date) return;
     flush();
@@ -141,22 +152,31 @@ export function DayBook() {
     setMany: (patch: PageFields) => patchPage(which, patch),
   });
 
+  const isToday = date === today;
+  const level = entry?.level ?? null;
+  const title = isToday ? greeting(settings.name, new Date().getHours()) : formatLong(date);
+
   return <div className="space-y-6">
-    <header className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
+    <section className="day-hero" aria-label="Ziua">
+      <div className="relative z-10 flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          {isToday && <p className="text-sm font-bold text-[var(--rose-dark)] first-letter:uppercase">{formatLong(date)}</p>}
+          <h1 className="display mt-1 text-3xl font-semibold leading-tight text-[var(--wine)] first-letter:uppercase sm:text-4xl">{title}</h1>
+          <p className="mt-2 leading-7 text-[var(--muted)]">{subline(level, settings.tone, isToday ? yesterday : null)}</p>
+        </div>
+        <div className="orb" aria-hidden="true"><div className="orb-core" data-level={level ?? "none"} /></div>
+      </div>
+      <div className="relative z-10 mt-5 flex items-center justify-between gap-2">
         <button type="button" onClick={() => go(shiftDate(date, -1))} aria-label="Ziua precedentă" className="grid size-12 place-items-center rounded-full border hairline bg-white text-[var(--wine)]"><ArrowLeft size={20} aria-hidden="true" /></button>
-        <div className="min-w-0 text-center">
-          <h1 className="display text-2xl font-semibold leading-tight text-[var(--wine)] first-letter:uppercase sm:text-3xl">{formatLong(date)}</h1>
-          {date !== today && <button type="button" onClick={() => go(today)} className="mt-1 text-sm font-bold text-[var(--rose)] underline underline-offset-4">Înapoi la azi</button>}
+        <div className="flex min-w-0 flex-col items-center gap-1">
+          {!isToday && <button type="button" onClick={() => go(today)} className="text-sm font-bold text-[var(--rose)] underline underline-offset-4">Înapoi la azi</button>}
+          <label className="flex items-center gap-2 text-sm text-[var(--muted)]">Mergi la o zi
+            <input type="date" value={date} onChange={(e) => go(e.target.value)} className="min-h-10 rounded-lg border hairline bg-white px-2 text-[var(--ink)]" />
+          </label>
         </div>
         <button type="button" onClick={() => go(shiftDate(date, 1))} aria-label="Ziua următoare" className="grid size-12 place-items-center rounded-full border hairline bg-white text-[var(--wine)]"><ArrowRight size={20} aria-hidden="true" /></button>
       </div>
-      <div className="flex justify-center">
-        <label className="flex items-center gap-2 text-sm text-[var(--muted)]">Mergi la o zi
-          <input type="date" value={date} onChange={(e) => go(e.target.value)} className="min-h-10 rounded-lg border hairline bg-white px-2 text-[var(--ink)]" />
-        </label>
-      </div>
-    </header>
+    </section>
 
     <div role="radiogroup" aria-label="Cum ești azi?" className="space-y-2">
       <p className="text-sm font-bold text-[var(--wine)]">Cum ești azi?</p>
@@ -165,7 +185,7 @@ export function DayBook() {
           const on = entry?.level === id;
           const colors = levelColors[id];
           return <button key={id} type="button" role="radio" aria-checked={on} disabled={!entry} onClick={() => setLevel(id)}
-            style={on ? { backgroundColor: colors.bg, color: colors.fg, borderColor: "#432D3D" } : undefined}
+            style={on ? { backgroundColor: colors.bg, color: colors.fg, borderColor: "var(--wine)" } : undefined}
             className={`flex min-h-20 flex-col items-center justify-center rounded-2xl border-2 px-2 py-3 text-center transition-colors ${on ? "" : "border-[var(--line)] bg-white text-[var(--wine)]"}`}>
             <span className="text-sm font-extrabold">{levelLabels[id]}</span>
             <span className={`mt-0.5 text-xs ${on ? "opacity-90" : "text-[var(--muted)]"}`}>{hint}</span>
@@ -181,8 +201,8 @@ export function DayBook() {
 
     <div id="pagina-zilei" role="tabpanel" aria-labelledby={`tab-${page}`} aria-busy={!entry}>
       {!entry ? <p className="py-10 text-center text-[var(--muted)]">Se deschide pagina…</p>
-        : page === "azi" ? <AziPage {...common("azi")} level={entry.level} />
-        : page === "acum" ? <AcumPage {...common("acum")} />
+        : page === "azi" ? <AziPage {...common("azi")} level={entry.level} modules={settings.modules} wins={settings.wins.filter((w) => w.trim() !== "")} />
+        : page === "acum" ? <AcumPage {...common("acum")} level={entry.level} picked={pickedForToday(entry).length} over={overLimit(entry)} onSend={sendToToday} />
         : page === "resetare" ? <ResetPage {...common("acum")} pauseDays={pauseDays} onStart={startFromReset} />
         : <SearaPage {...common("seara")} />}
     </div>
