@@ -1,0 +1,23 @@
+# Șablon de completat pentru Cloudflare. Nu pune acest fișier completat în GitHub.
+# Are două părți: A merge într-un fișier .env.local pe calculatorul tău (variabile de build),
+# B se trimite la Cloudflare ca secrete, cu comanda indicată în DEPLOY-CLOUDFLARE.md.
+
+# ===== A. .env.local (pe calculatorul tău, în folderul proiectului) =====
+# Variabilele NEXT_PUBLIC_* se încorporează la build: după ce le schimbi, rulezi din nou npm run deploy.
+NEXT_PUBLIC_SITE_URL=https://ritualuldeazi.ro
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# Gol = pre-lansare. "carte" = se deschid Prețurile, contul și plata.
+NEXT_PUBLIC_LAUNCH_MODE=
+# Opțional: Google Analytics
+NEXT_PUBLIC_GA_ID=
+
+# ===== B. Secrete pentru Cloudflare (câte unul pe comandă: npx wrangler secret put NUME) =====
+# SUPABASE_SECRET_KEY        cheia sb_secret_... din Supabase (Project Settings -> API)
+# STRIPE_SECRET_KEY          cheia Stripe (începe cu Test mode; preferă rk_...)
+# STRIPE_WEBHOOK_SECRET      whsec_... din Stripe -> Developers -> Webhooks
+# RESEND_API_KEY             cheia din Resend
+# RESEND_FROM_EMAIL          Ritualul de azi <hello@ritualuldeazi.ro>
+# CARTE_PAYWALL              "on" = Cartea cere abonament. Nu-l seta până nu testezi plata.
+# CARTE_TRIAL_CARD           opțional: "optional" = proba de 3 zile fără card
+# STRIPE_CARTE_MONTHLY_PRICE_ID, STRIPE_CARTE_ANNUAL_PRICE_ID   opționale, pot rămâne nesetate
