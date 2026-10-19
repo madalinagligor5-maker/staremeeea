@@ -78,7 +78,11 @@ Bonusurile PDF se generează cu `python3 scripts/bonusuri.py` (rezultat în `pub
 
 Verifică domeniul expeditor, apoi setează `RESEND_API_KEY` și `RESEND_FROM_EMAIL`. Confirmarea emailului și resetarea parolei se configurează în template-urile Supabase Auth; `src/lib/email.ts` asigură mesajele tranzacționale de produs.
 
-## Cloudflare Workers
+## Vercel
+
+Site-ul rulează pe Vercel, cu `next build` standard. Pașii pentru variabile, Supabase, Stripe și Resend sunt în [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md); un șablon de completat este în `vercel-env-template.txt`.
+
+## Cloudflare Workers (alternativă, nefolosită acum)
 
 Cloudflare recomandă acum vinext pentru proiecte Next.js noi. Configurația păstrează și dezvoltarea standard Next.js:
 
