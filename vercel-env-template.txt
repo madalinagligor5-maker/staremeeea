@@ -1,0 +1,35 @@
+# Șablon pentru variabilele din Vercel (Project -> Settings -> Environment Variables).
+# Completează valorile de după "=" și lipește tot blocul în primul câmp Key din Vercel (acceptă mai multe rânduri).
+# NU pune acest fișier completat în GitHub. Este doar șablon, fără valori reale.
+# Variabilele NEXT_PUBLIC_* se aplică la build: după ce le schimbi, fă Redeploy.
+
+# --- Site ---
+NEXT_PUBLIC_SITE_URL=https://ritualuldeazi.ro
+
+# --- Supabase (Project Settings -> API) ---
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# Doar server. Nu o pune niciodată într-o variabilă NEXT_PUBLIC_*.
+SUPABASE_SECRET_KEY=
+
+# --- Stripe (Developers -> API keys; începe cu cheile din Test mode) ---
+STRIPE_SECRET_KEY=
+# Din Developers -> Webhooks -> endpoint-ul tău -> Signing secret (începe cu whsec_)
+STRIPE_WEBHOOK_SECRET=
+# Opționale: lasă goale dacă vrei ca prețul să se creeze la plată (25 lei/lună, 225 lei/an)
+STRIPE_CARTE_MONTHLY_PRICE_ID=
+STRIPE_CARTE_ANNUAL_PRICE_ID=
+# "optional" = proba de 3 zile pornește fără card. Gol = proba cere card.
+CARTE_TRIAL_CARD=
+# "on" = Cartea cere abonament activ. Gol = deschisă (doar pentru testare).
+CARTE_PAYWALL=
+
+# --- Resend (email) ---
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=Ritualul de azi <hello@ritualuldeazi.ro>
+
+# --- Lansare ---
+# Gol = pre-lansare (pagina de lansare + listă de așteptare). "carte" = se deschid Prețurile, contul și plata.
+NEXT_PUBLIC_LAUNCH_MODE=
+# Opțional: Google Analytics (se activează doar dacă vizitatorul acceptă)
+NEXT_PUBLIC_GA_ID=

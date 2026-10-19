@@ -1,4 +1,6 @@
+# Scripturile de build ale acestor pachete nu sunt necesare pentru `next build` pe Vercel.
+# esbuild și workerd sunt folosite doar de vinext/wrangler (publicarea pe Cloudflare).
 allowBuilds:
-  esbuild: set this to true or false
-  unrs-resolver: set this to true or false
-  workerd: set this to true or false
+  esbuild: false
+  unrs-resolver: false
+  workerd: false
